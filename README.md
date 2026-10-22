@@ -8,8 +8,13 @@ Built with **React, TypeScript, Vite, and Tailwind CSS**.
 
 ## ✨ Features
 
+- **3,000 Questions Comprehensive Bank**:
+  - Dedicated practice section featuring **2,250 questions** across Weeks 1 to 12 extracted from 752 lecture pages.
+  - Separated according to weeks for focused preparation.
+  - Flexible batch modes: 25-Question Sprint, 50-Question Focused, 100-Question Marathon, or Full Week Set.
+  - In-line question browser with answer & explanation toggles.
 - **Live Exam Countdown**: Real-time ticker counting down to the exam date (23 October 2026).
-- **12 Week Comprehensive Question Bank**: Extracted from official NPTEL assignment submissions (2024, 2025) and IIT Guwahati detailed solution keys.
+- **Assignment Question Bank (148 Qs)**: Extracted from official NPTEL assignment submissions (2024, 2025) and IIT Guwahati detailed solution keys.
 - **Practice Mode**:
   - Instant answer validation (green/red feedback).
   - Source PDF and page references for every question.

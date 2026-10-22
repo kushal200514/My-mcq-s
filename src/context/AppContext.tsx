@@ -1,10 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { Question, QuizAttempt, UserStats, AppSettings, WeekMeta } from '../types';
 import { WEEKS_METADATA } from '../data/questions';
+import { MEGA_QUESTIONS } from '../data/megaQuestions';
 import { StorageService } from '../services/storage';
 
 interface AppContextType {
   questions: Question[];
+  megaQuestions: Question[];
+  allQuestions: Question[];
   weeks: WeekMeta[];
   stats: UserStats;
   settings: AppSettings;
@@ -23,6 +26,14 @@ interface AppContextType {
   exportDataJson: () => string;
   importDataJson: (jsonStr: string) => { success: boolean; message: string };
   getWeekStats: (weekNum: number) => {
+    total: number;
+    attempted: number;
+    correct: number;
+    incorrect: number;
+    accuracy: number;
+    completed: boolean;
+  };
+  getMegaWeekStats: (weekNum: number) => {
     total: number;
     attempted: number;
     correct: number;
@@ -51,6 +62,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     StorageService.saveSettings(settings);
   }, [settings]);
+
+  const allQuestions = useMemo(() => {
+    return [...questions, ...MEGA_QUESTIONS];
+  }, [questions]);
 
   const setActiveAttempt = (attempt: QuizAttempt | null) => {
     setActiveAttemptState(attempt);
@@ -86,9 +101,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const newQuestionHistory = { ...prev.questionHistory };
       const wrongSet = new Set(prev.wrongQuestionIds);
 
-      // Analyze question answers in this attempt
+      // Analyze question answers in this attempt (searches in all available questions)
       attempt.questionIds.forEach(qId => {
-        const q = questions.find(item => item.id === qId);
+        const q = allQuestions.find(item => item.id === qId);
         if (!q) return;
 
         const userAns = attempt.answers[qId];
@@ -258,10 +273,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { total, attempted, correct, incorrect, accuracy, completed };
   };
 
+  const getMegaWeekStats = (weekNum: number) => {
+    const weekQuestions = MEGA_QUESTIONS.filter(q => q.week === weekNum);
+    const total = weekQuestions.length;
+    let attempted = 0;
+    let correct = 0;
+
+    weekQuestions.forEach(q => {
+      const hist = stats.questionHistory[q.id];
+      if (hist && hist.attemptsCount > 0) {
+        attempted += 1;
+        if (hist.lastResult === 'correct') correct += 1;
+      }
+    });
+
+    const incorrect = attempted - correct;
+    const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+    const completed = total > 0 && attempted >= total;
+
+    return { total, attempted, correct, incorrect, accuracy, completed };
+  };
+
   return (
     <AppContext.Provider
       value={{
         questions,
+        megaQuestions: MEGA_QUESTIONS,
+        allQuestions,
         weeks: WEEKS_METADATA,
         stats,
         settings,
@@ -279,7 +317,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSettings,
         exportDataJson,
         importDataJson,
-        getWeekStats
+        getWeekStats,
+        getMegaWeekStats
       }}
     >
       {children}

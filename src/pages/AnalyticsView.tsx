@@ -13,9 +13,16 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { WeekFilterType, QuizMode, QuestionBankType } from '../types';
 
 interface AnalyticsViewProps {
-  onStartQuiz: (options: { week?: number | 'all' | 'incorrect'; mode: 'practice' | 'exam' }) => void;
+  onStartQuiz: (options: { 
+    week?: WeekFilterType; 
+    mode?: QuizMode;
+    onlyIncorrect?: boolean;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
+  }) => void;
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onStartQuiz }) => {

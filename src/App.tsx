@@ -4,13 +4,14 @@ import { Sidebar, NavTab } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './pages/Dashboard';
 import { WeeklyBank } from './pages/WeeklyBank';
+import { MegaQuestionBank } from './pages/MegaQuestionBank';
 import { QuizView } from './pages/QuizView';
 import { ResultsView } from './pages/ResultsView';
 import { BookmarksView } from './pages/BookmarksView';
 import { AnalyticsView } from './pages/AnalyticsView';
 import { VerificationView } from './pages/VerificationView';
 import { SettingsView } from './pages/SettingsView';
-import { QuizAttempt, QuizMode } from './types';
+import { QuizAttempt, QuizMode, WeekFilterType, QuestionBankType } from './types';
 
 const MainApp: React.FC = () => {
   const { saveCompletedAttempt, activeAttempt } = useApp();
@@ -19,8 +20,10 @@ const MainApp: React.FC = () => {
 
   // Active quiz config
   const [quizParams, setQuizParams] = useState<{
-    week: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen';
+    week: WeekFilterType;
     mode: QuizMode;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
   }>({ week: 1, mode: 'practice' });
 
   // Last completed attempt for Results view
@@ -28,17 +31,24 @@ const MainApp: React.FC = () => {
 
   // Trigger starting a quiz
   const handleStartQuiz = (options: {
-    week?: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen';
+    week?: WeekFilterType;
     mode?: QuizMode;
     onlyIncorrect?: boolean;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
   }) => {
-    let weekTarget: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen' = options.week !== undefined ? options.week : 1;
+    let weekTarget: WeekFilterType = options.week !== undefined ? options.week : 1;
     if (options.onlyIncorrect) {
       weekTarget = 'incorrect';
     }
 
     const selectedMode: QuizMode = options.mode || 'practice';
-    setQuizParams({ week: weekTarget, mode: selectedMode });
+    setQuizParams({
+      week: weekTarget,
+      mode: selectedMode,
+      questionLimit: options.questionLimit,
+      bankType: options.bankType
+    });
     setCurrentTab(selectedMode === 'exam' ? 'exam' : 'quiz');
   };
 
@@ -88,6 +98,12 @@ const MainApp: React.FC = () => {
             />
           )}
 
+          {currentTab === 'mega' && (
+            <MegaQuestionBank
+              onStartQuiz={handleStartQuiz}
+            />
+          )}
+
           {currentTab === 'weeks' && (
             <WeeklyBank
               onStartQuiz={handleStartQuiz}
@@ -98,6 +114,8 @@ const MainApp: React.FC = () => {
             <QuizView
               initialWeekFilter={quizParams.week}
               initialMode={quizParams.mode}
+              questionLimit={quizParams.questionLimit}
+              bankType={quizParams.bankType}
               onCompleteQuiz={handleCompleteQuiz}
               onExit={handleExitQuiz}
             />

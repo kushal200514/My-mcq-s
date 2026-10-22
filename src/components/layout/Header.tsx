@@ -12,7 +12,8 @@ interface HeaderProps {
 
 const TAB_TITLES: Record<NavTab, { title: string; subtitle: string }> = {
   dashboard: { title: 'Exam Dashboard', subtitle: 'Overview, countdown, and mastery breakdown' },
-  weeks: { title: 'Week-Wise Question Bank', subtitle: 'Assignments 1 to 12 extracted from NPTEL' },
+  mega: { title: '3,000 Questions Comprehensive Bank', subtitle: 'Full 12-week question repository with 2,250 verified lecture questions' },
+  weeks: { title: 'Assignment Question Bank', subtitle: 'Assignments 1 to 12 extracted from NPTEL' },
   quiz: { title: 'Practice Mode', subtitle: 'Immediate feedback with detailed source explanations' },
   exam: { title: 'Timed Mock Exam', subtitle: 'Simulate official exam conditions without premature answers' },
   saved: { title: 'Saved & Difficult Questions', subtitle: 'High-priority revision for exam readiness' },

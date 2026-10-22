@@ -7,6 +7,8 @@ export interface QuestionOption {
   text: string;
 }
 
+export type QuestionBankType = 'assignment' | 'mega';
+
 export interface Question {
   id: string;
   originalQuestionNumber: number;
@@ -23,6 +25,7 @@ export interface Question {
   sourcePage: number;
   verificationStatus: VerificationStatus;
   verificationNotes?: string;
+  bankType?: QuestionBankType;
 }
 
 export interface WeekMeta {
@@ -35,10 +38,20 @@ export interface WeekMeta {
 
 export type QuizMode = 'practice' | 'exam';
 
+export type WeekFilterType = 
+  | number 
+  | 'all' 
+  | 'bookmarks' 
+  | 'difficult' 
+  | 'incorrect' 
+  | 'unseen'
+  | `mega-${number}`
+  | 'mega-all';
+
 export interface QuizAttempt {
   id: string;
   title: string;
-  weekFilter: number | 'all' | 'bookmarks' | 'difficult' | 'incorrect' | 'unseen';
+  weekFilter: WeekFilterType;
   mode: QuizMode;
   startedAt: number;
   completedAt?: number;
@@ -51,6 +64,7 @@ export interface QuizAttempt {
   accuracyPercentage: number;
   durationSeconds: number;
   timeLimitMinutes?: number;
+  bankType?: QuestionBankType;
 }
 
 export interface UserStats {

@@ -9,12 +9,14 @@ import {
   FileCheck, 
   Settings,
   Sparkles,
-  GraduationCap
+  GraduationCap,
+  Layers
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export type NavTab = 
   | 'dashboard' 
+  | 'mega'
   | 'weeks' 
   | 'quiz' 
   | 'exam' 
@@ -41,7 +43,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'dashboard' as NavTab, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'weeks' as NavTab, label: 'Week Question Bank', icon: BookOpen, badge: '12 Weeks' },
+    { 
+      id: 'mega' as NavTab, 
+      label: '3,000 Questions Bank', 
+      icon: Layers, 
+      badge: '3,000 Qs',
+      special: true 
+    },
+    { id: 'weeks' as NavTab, label: 'Assignment Bank', icon: BookOpen, badge: '148 Qs' },
     { id: 'quiz' as NavTab, label: 'Practice Mode', icon: PlayCircle },
     { id: 'exam' as NavTab, label: 'Timed Exam Mode', icon: Timer, highlight: true },
     { 
@@ -135,8 +144,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 {item.badge && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                    isActive ? 'bg-brand-700 text-white' : 'bg-slate-800 text-slate-300'
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    isActive 
+                      ? 'bg-brand-700 text-white' 
+                      : (item as any).special
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm shadow-amber-500/20 animate-pulse'
+                        : 'bg-slate-800 text-slate-300'
                   }`}>
                     {item.badge}
                   </span>

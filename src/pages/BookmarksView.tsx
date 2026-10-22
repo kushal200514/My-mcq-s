@@ -8,13 +8,13 @@ interface BookmarksViewProps {
 }
 
 export const BookmarksView: React.FC<BookmarksViewProps> = ({ onStartQuiz }) => {
-  const { questions, stats, toggleBookmark, toggleDifficult } = useApp();
+  const { allQuestions, stats, toggleBookmark, toggleDifficult } = useApp();
   const [activeTab, setActiveTab] = useState<'bookmarks' | 'difficult'>('bookmarks');
   const [revealedAnswers, setRevealedAnswers] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState('');
 
-  const bookmarkedQuestions = questions.filter(q => stats.bookmarkedQuestionIds.includes(q.id));
-  const difficultQuestions = questions.filter(q => stats.difficultQuestionIds.includes(q.id));
+  const bookmarkedQuestions = allQuestions.filter(q => stats.bookmarkedQuestionIds.includes(q.id));
+  const difficultQuestions = allQuestions.filter(q => stats.difficultQuestionIds.includes(q.id));
 
   const currentList = activeTab === 'bookmarks' ? bookmarkedQuestions : difficultQuestions;
 

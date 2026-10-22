@@ -16,10 +16,16 @@ import {
   BookOpen
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Question } from '../types';
+import { Question, WeekFilterType, QuizMode, QuestionBankType } from '../types';
 
 interface WeeklyBankProps {
-  onStartQuiz: (options: { week: number; mode: 'practice' | 'exam'; onlyIncorrect?: boolean }) => void;
+  onStartQuiz: (options: { 
+    week?: WeekFilterType; 
+    mode?: QuizMode; 
+    onlyIncorrect?: boolean;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
+  }) => void;
 }
 
 export const WeeklyBank: React.FC<WeeklyBankProps> = ({ onStartQuiz }) => {

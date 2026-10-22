@@ -18,12 +18,14 @@ import {
   Check,
   Award
 } from 'lucide-react';
-import { Question, QuizAttempt, QuizMode } from '../types';
+import { Question, QuizAttempt, QuizMode, WeekFilterType, QuestionBankType } from '../types';
 import { useApp } from '../context/AppContext';
 
 interface QuizViewProps {
-  initialWeekFilter?: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen';
+  initialWeekFilter?: WeekFilterType;
   initialMode?: QuizMode;
+  questionLimit?: number;
+  bankType?: QuestionBankType;
   onCompleteQuiz: (attempt: QuizAttempt) => void;
   onExit: () => void;
 }
@@ -31,11 +33,15 @@ interface QuizViewProps {
 export const QuizView: React.FC<QuizViewProps> = ({
   initialWeekFilter = 1,
   initialMode = 'practice',
+  questionLimit,
+  bankType,
   onCompleteQuiz,
   onExit
 }) => {
   const { 
     questions, 
+    megaQuestions,
+    allQuestions,
     weeks, 
     stats, 
     settings, 
@@ -48,7 +54,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
   } = useApp();
 
   const [mode, setMode] = useState<QuizMode>(initialMode);
-  const [weekFilter, setWeekFilter] = useState<number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen'>(initialWeekFilter);
+  const [weekFilter, setWeekFilter] = useState<WeekFilterType>(initialWeekFilter);
   const [currentIndex, setCurrentIndex] = useState(0);
   
   // Selected answers for the current attempt: questionId -> optionId or optionId[]
@@ -79,21 +85,32 @@ export const QuizView: React.FC<QuizViewProps> = ({
     } else if (weekFilter === 'all') {
       list = [...questions];
     } else if (weekFilter === 'incorrect') {
-      list = questions.filter(q => stats.wrongQuestionIds.includes(q.id));
+      list = allQuestions.filter(q => stats.wrongQuestionIds.includes(q.id));
     } else if (weekFilter === 'bookmarks') {
-      list = questions.filter(q => stats.bookmarkedQuestionIds.includes(q.id));
+      list = allQuestions.filter(q => stats.bookmarkedQuestionIds.includes(q.id));
     } else if (weekFilter === 'difficult') {
-      list = questions.filter(q => stats.difficultQuestionIds.includes(q.id));
+      list = allQuestions.filter(q => stats.difficultQuestionIds.includes(q.id));
     } else if (weekFilter === 'unseen') {
-      list = questions.filter(q => !stats.questionHistory[q.id]);
+      list = allQuestions.filter(q => !stats.questionHistory[q.id]);
+    } else if (typeof weekFilter === 'string' && weekFilter.startsWith('mega-')) {
+      if (weekFilter === 'mega-all') {
+        list = [...megaQuestions];
+      } else {
+        const weekNum = parseInt(weekFilter.replace('mega-', ''), 10);
+        list = megaQuestions.filter(q => q.week === weekNum);
+      }
     }
 
     if (settings.shuffleQuestions) {
       list = [...list].sort(() => Math.random() - 0.5);
     }
 
+    if (questionLimit && questionLimit > 0 && list.length > questionLimit) {
+      list = list.slice(0, questionLimit);
+    }
+
     return list;
-  }, [questions, weekFilter, stats, settings.shuffleQuestions]);
+  }, [questions, megaQuestions, allQuestions, weekFilter, stats, settings.shuffleQuestions, questionLimit]);
 
   // Current active question
   const currentQuestion: Question | undefined = quizQuestions[currentIndex];
@@ -252,7 +269,8 @@ export const QuizView: React.FC<QuizViewProps> = ({
       score: correctCount,
       accuracyPercentage: accuracy,
       durationSeconds: Math.max(1, duration),
-      timeLimitMinutes: mode === 'exam' ? settings.defaultExamDurationMinutes : undefined
+      timeLimitMinutes: mode === 'exam' ? settings.defaultExamDurationMinutes : undefined,
+      bankType: (typeof weekFilter === 'string' && weekFilter.startsWith('mega-')) ? 'mega' : (bankType || 'assignment')
     };
 
     onCompleteQuiz(completedAttempt);
@@ -262,6 +280,11 @@ export const QuizView: React.FC<QuizViewProps> = ({
     if (typeof weekFilter === 'number') {
       const w = weeks.find(item => item.week === weekFilter);
       return `Week ${weekFilter}: ${w ? w.title : 'Assignment'}`;
+    }
+    if (typeof weekFilter === 'string' && weekFilter.startsWith('mega-')) {
+      if (weekFilter === 'mega-all') return '3,000 Questions Comprehensive Bank (All Weeks)';
+      const wNum = parseInt(weekFilter.replace('mega-', ''), 10);
+      return `Week ${wNum} Practice • 3,000 Questions Bank`;
     }
     if (weekFilter === 'all') return 'Full Course Mock Exam (All Weeks)';
     if (weekFilter === 'incorrect') return 'Revision: Previously Missed Questions';

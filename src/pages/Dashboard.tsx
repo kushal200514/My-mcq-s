@@ -14,19 +14,28 @@ import {
   RotateCcw,
   Sparkles,
   TrendingUp,
-  Award
+  Award,
+  Layers,
+  Zap
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ExamCountdown } from '../components/layout/ExamCountdown';
 import { NavTab } from '../components/layout/Sidebar';
+import { WeekFilterType, QuestionBankType, QuizMode } from '../types';
 
 interface DashboardProps {
   onNavigate: (tab: NavTab) => void;
-  onStartQuiz: (options: { week?: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult'; mode?: 'practice' | 'exam' }) => void;
+  onStartQuiz: (options: {
+    week?: WeekFilterType;
+    mode?: QuizMode;
+    onlyIncorrect?: boolean;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
+  }) => void;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onStartQuiz }) => {
-  const { questions, weeks, stats, activeAttempt, getWeekStats } = useApp();
+  const { questions, megaQuestions, weeks, stats, activeAttempt, getWeekStats } = useApp();
 
   const totalQuestions = questions.length;
   const attemptedCount = stats.totalAttempted;
@@ -277,6 +286,52 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onStartQuiz })
           </div>
         </div>
       )}
+
+      {/* 3,000 Questions Comprehensive Bank Spotlight */}
+      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-gradient-to-r from-purple-950/80 via-slate-900 to-indigo-950/90 border border-purple-500/30 shadow-2xl">
+        <div className="absolute right-0 top-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>NEW • 3,000 Questions Practice Bank</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              3,000 Questions Comprehensive Repository
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Exhaustive collection of <strong className="text-white">2,250 verified questions</strong> extracted from all 752 pages across Weeks 1 to 12. Complete with explanations, lecture slide references, and sprint practice modes.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-400">
+              <span className="flex items-center gap-1 text-purple-300 font-semibold">
+                <Layers className="w-3.5 h-3.5" /> 12 Weeks Structured
+              </span>
+              <span>•</span>
+              <span className="text-slate-300">300 Qs in Week 1</span>
+              <span>•</span>
+              <span className="text-slate-300">150-200 Qs/Week (Weeks 2-12)</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => onNavigate('mega')}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-purple-600/30 transition-all hover:scale-[1.02]"
+            >
+              <Layers className="w-4 h-4" />
+              <span>Open 3,000 Qs Bank</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onStartQuiz({ week: 'mega-all', mode: 'practice', questionLimit: 25, bankType: 'mega' })}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-semibold text-sm transition-all"
+            >
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>Quick 25 Sprint</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Week-Wise Progress Grid (12 Weeks) */}
       <div className="space-y-4">

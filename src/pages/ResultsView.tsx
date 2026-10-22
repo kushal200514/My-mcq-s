@@ -15,12 +15,18 @@ import {
   ChevronRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { QuizAttempt, Question } from '../types';
+import { QuizAttempt, Question, WeekFilterType, QuizMode, QuestionBankType } from '../types';
 import { useApp } from '../context/AppContext';
 
 interface ResultsViewProps {
   attempt: QuizAttempt;
-  onRetryQuiz: (options: { week?: number | 'all' | 'incorrect' | 'bookmarks' | 'difficult' | 'unseen'; mode?: 'practice' | 'exam' }) => void;
+  onRetryQuiz: (options: { 
+    week?: WeekFilterType; 
+    mode?: QuizMode;
+    onlyIncorrect?: boolean;
+    questionLimit?: number;
+    bankType?: QuestionBankType;
+  }) => void;
   onReturnDashboard: () => void;
 }
 
@@ -29,7 +35,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   onRetryQuiz,
   onReturnDashboard
 }) => {
-  const { questions, toggleBookmark, isBookmarked } = useApp();
+  const { allQuestions, toggleBookmark, isBookmarked } = useApp();
 
   const total = attempt.questionIds.length;
   const correct = attempt.correctCount;
@@ -49,7 +55,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   }, [accuracy]);
 
   // Map question data for review
-  const reviewQuestions = attempt.questionIds.map(id => questions.find(q => q.id === id)).filter(Boolean) as Question[];
+  const reviewQuestions = attempt.questionIds.map(id => allQuestions.find(q => q.id === id)).filter(Boolean) as Question[];
 
   // Identify topics user missed in this attempt
   const missedTopicsMap: Record<string, number> = {};
