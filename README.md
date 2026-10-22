@@ -1,5 +1,7 @@
 # My-mcq-s: NPTEL Interactive Exam Preparation Platform
 
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/kushal200514/My-mcq-s)
+
 An interactive exam preparation web application for practicing questions from the **NPTEL Design and Implementation of Human-Computer Interfaces (HCI)** course.
 
 Built with **React, TypeScript, Vite, and Tailwind CSS**.
